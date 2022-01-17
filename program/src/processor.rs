@@ -23,21 +23,21 @@ impl Processor {
             .map_err(|_| ProgramError::InvalidInstructionData)?;
 
         match instruction {
-            ChudexInstruction::InitializePool { } => {
+            ChudexInstruction::InitializePool { fee, fee_decimals } => {
                 msg!("Instruction: InitializeChudex");
-                initialize_pool::process(program_id, accounts)?;
+                initialize_pool::process(program_id, accounts, fee, fee_decimals)?;
             }
-            ChudexInstruction::Deposit { } => {
+            ChudexInstruction::Deposit { pool_token_amount, max_token_a_amount, max_token_b_amount } => {
                 msg!("Instruction: Deposit");
-                deposit::process(program_id, accounts)?;
+                deposit::process(program_id, accounts, pool_token_amount, max_token_a_amount, max_token_b_amount)?;
             }
-            ChudexInstruction::Withdraw { } => {
+            ChudexInstruction::Withdraw { pool_token_amount, min_token_a_amount, min_token_b_amount } => {
                 msg!("Instruction: Withdraw");
-                withdraw::process(program_id, accounts)?;
+                withdraw::process(program_id, accounts, pool_token_amount, min_token_a_amount, min_token_b_amount)?;
             }
-            ChudexInstruction::Exchange { } => {
+            ChudexInstruction::Exchange { amount_in, min_amount_out } => {
                 msg!("Instruction: Withdraw");
-                exchange::process(program_id, accounts)?;
+                exchange::process(program_id, accounts, amount_in, min_amount_out)?;
             }
         }
 

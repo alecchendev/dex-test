@@ -16,7 +16,8 @@ use borsh::{BorshDeserialize, BorshSerialize};
 pub fn process(
     program_id: &Pubkey,
     accounts: &[AccountInfo],
-    // ???
+    amount_in: u64,
+    min_amount_out: u64,
 ) -> ProgramResult {
     Ok(())
 }
