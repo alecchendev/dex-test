@@ -4,12 +4,11 @@ use solana_program::{
     pubkey::Pubkey,
 };
 
-use crate::instruction::ExchangeBoothInstruction;
+use crate::instruction::ChudexInstruction;
 
-pub mod close_exchange_booth;
 pub mod deposit;
 pub mod exchange;
-pub mod initialize_exchange_booth;
+pub mod initialize_pool;
 pub mod withdraw;
 
 pub struct Processor {}
@@ -20,29 +19,25 @@ impl Processor {
         accounts: &[AccountInfo],
         instruction_data: &[u8],
     ) -> ProgramResult {
-        let instruction = ExchangeBoothInstruction::try_from_slice(instruction_data)
+        let instruction = ChudexInstruction::try_from_slice(instruction_data)
             .map_err(|_| ProgramError::InvalidInstructionData)?;
 
         match instruction {
-            ExchangeBoothInstruction::InititializeExchangeBooth { } => {
-                msg!("Instruction: InitializeExchangeBooth");
-                initialize_exchange_booth::process(program_id, accounts)?;
+            ChudexInstruction::InitializePool { } => {
+                msg!("Instruction: InitializeChudex");
+                initialize_pool::process(program_id, accounts)?;
             }
-            ExchangeBoothInstruction::Deposit { } => {
+            ChudexInstruction::Deposit { } => {
                 msg!("Instruction: Deposit");
                 deposit::process(program_id, accounts)?;
             }
-            ExchangeBoothInstruction::Withdraw { } => {
+            ChudexInstruction::Withdraw { } => {
                 msg!("Instruction: Withdraw");
                 withdraw::process(program_id, accounts)?;
             }
-            ExchangeBoothInstruction::Exchange { } => {
+            ChudexInstruction::Exchange { } => {
                 msg!("Instruction: Withdraw");
                 exchange::process(program_id, accounts)?;
-            }
-            ExchangeBoothInstruction::CloseExchangeBooth { } => {
-                msg!("Instruction: CloseExchangeBooth");
-                close_exchange_booth::process(program_id, accounts)?;
             }
         }
 

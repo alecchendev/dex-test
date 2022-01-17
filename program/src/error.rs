@@ -3,7 +3,7 @@ use solana_program::program_error::ProgramError;
 use thiserror::Error;
 
 #[derive(Error, Debug, Copy, Clone, FromPrimitive, PartialEq)]
-pub enum ExchangeBoothError {
+pub enum ChudexError {
     #[error("Account must be writable.")]
     AccountMustBeWritable,
     #[error("Account not initialized.")]
@@ -26,8 +26,8 @@ pub enum ExchangeBoothError {
     InvalidAccountData,
 }
 
-impl From<ExchangeBoothError> for ProgramError {
-    fn from(e: ExchangeBoothError) -> Self {
+impl From<ChudexError> for ProgramError {
+    fn from(e: ChudexError) -> Self {
         ProgramError::Custom(e as u32)
     }
 }

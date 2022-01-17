@@ -1,8 +1,8 @@
 use borsh::{BorshDeserialize, BorshSerialize};
 
 #[derive(BorshSerialize, BorshDeserialize, Debug, Clone)]
-pub enum ExchangeBoothInstruction {
-    InititializeExchangeBooth {
+pub enum ChudexInstruction {
+    InitializePool {
         // TODO
      },
     Deposit {
@@ -12,9 +12,6 @@ pub enum ExchangeBoothInstruction {
         // TODO
     },
     Exchange {
-        // TODO
-    },
-    CloseExchangeBooth {
         // TODO
     },
 }

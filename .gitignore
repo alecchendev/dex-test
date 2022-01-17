@@ -1,0 +1,7 @@
+*node_modules/
+*package-lock.json
+*test-ledger/
+*target
+/.DS_Store
+program/target
+program/Cargo.lock

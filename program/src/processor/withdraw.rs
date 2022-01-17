@@ -1,9 +1,13 @@
 use solana_program::{
+    account_info::AccountInfo,
+    entrypoint::ProgramResult,
+    msg,
+    pubkey::Pubkey
 };
 
 use crate::{
-    error::ExchangeBoothError,
-    state::ExchangeBooth,
+    error::ChudexError,
+    state::Pool,
 };
 
 use borsh::{BorshDeserialize, BorshSerialize};
