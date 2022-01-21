@@ -24,7 +24,7 @@ impl Processor {
 
         match instruction {
             ChudexInstruction::InitializePool { fee, fee_decimals } => {
-                msg!("Instruction: InitializeChudex");
+                msg!("Instruction: InitializePool");
                 initialize_pool::process(program_id, accounts, fee, fee_decimals)?;
             }
             ChudexInstruction::Deposit { pool_token_amount, max_token_a_amount, max_token_b_amount } => {

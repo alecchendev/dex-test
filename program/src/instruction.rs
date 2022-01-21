@@ -5,11 +5,15 @@ pub enum ChudexInstruction {
     /// Initializes a new pool. Creates mint and accounts for pool struct and token vaults.
     /// 
     /// Accounts:
-    /// user
-    /// pool token acc a
-    /// pool token acc b
-    /// pool token mint
+    /// [signer] user
+    /// [writable] pool
+    /// [writable] pool token acc a
+    /// [writable] pool token acc b
+    /// mint a
+    /// mint b
+    /// [writable] pool token mint
     /// token program
+    /// system program
     InitializePool {
         // TODO
         fee: u64,
