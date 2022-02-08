@@ -1,4 +1,13 @@
 # chudex
-Recreating basic dex/amm on solana as a reference for dev onboarding + practice with newfound solana skillz.
+Basic dex/amm for educational reference and practice with newfound solana skillz.
 
-If anyone would like to create a logo for this hmu
+### Usage
+Deploy contract.
+
+Then in the client folder, use these commands.
+
+### To do
+- InitializePool
+    - fix token ordering
+    - clean extraneous accounts, documents accounts
+    - proper account validation

@@ -11,9 +11,11 @@ pub enum ChudexInstruction {
     /// [writable] pool token acc b
     /// mint a
     /// mint b
-    /// [writable] pool token mint
+    /// [signer, writable] pool token mint
     /// token program
     /// system program
+    /// sysvar
+    /// associated token program
     InitializePool {
         // TODO
         fee: u64,

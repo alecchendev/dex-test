@@ -200,7 +200,7 @@ const main = async () => {
       },
       {
         pubkey: poolMint.publicKey,
-        isSigner: false,
+        isSigner: true,
         isWritable: true,
       },
       {
@@ -238,7 +238,7 @@ const main = async () => {
   let initTxid = await sendAndConfirmTransaction(
     connection,
     initTx,
-    [user],
+    [user, poolMint],
     {
       skipPreflight: true,
       preflightCommitment: "confirmed",

@@ -195,14 +195,38 @@ pub fn process(
                 sysvar_rent.clone(),
                 associated_token_program.clone()
             ],
-        );
+        )?;
         msg!("initialized vault b");
     }
 
     // create mint
     if pool_mint_ai.data_len() == 0 {
         msg!("Initializing mint...");
-        invoke_signed(
+        let mint_data_len = 82;
+        invoke(
+            &system_instruction::create_account(
+                user.key,
+                pool_mint_ai.key,
+                Rent::get()?.minimum_balance(mint_data_len),
+                mint_data_len as u64,
+                &spl_token::id(),
+            ),
+            &[user.clone(), pool_mint_ai.clone(), system_program.clone()],
+        )?;
+
+        // msg!("Mint data len: {}", mint_data_len);
+        // let mint_data = pool_mint_ai.try_borrow_data()?;
+        // for i in 0..mint_data_len {
+        //     msg!("{}: {}", i, mint_data[i]);
+        // }
+        // let mut mint = Mint::unpack(&pool_mint_ai.try_borrow_data()?)?;
+        // let mut buffer = authorized_buffer.try_borrow_mut_data()?;
+        // buffer[0] = bump;
+        // for i in 0..8 {
+        //     buffer[i + 1] = buffer_seed.to_le_bytes()[i];
+        // }
+
+        invoke(
             &instruction::initialize_mint(
                 &spl_token::id(),
                 pool_mint_ai.key,
@@ -210,8 +234,7 @@ pub fn process(
                 Some(pool_ai.key),
                 POOL_MINT_DECIMALS,
             )?,
-            &[ pool_mint_ai.clone(), token_program.clone(), system_program.clone() ],
-            &[ pool_seeds ],
+            &[ pool_mint_ai.clone(), sysvar_rent.clone(), token_program.clone() ],
         )?;
         msg!("Initialized mint");
     }
