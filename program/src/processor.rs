@@ -27,15 +27,38 @@ impl Processor {
                 msg!("Instruction: InitializePool");
                 initialize_pool::process(program_id, accounts, fee, fee_decimals)?;
             }
-            ChudexInstruction::Deposit { pool_token_amount, max_token_a_amount, max_token_b_amount } => {
+            ChudexInstruction::Deposit {
+                pool_token_amount,
+                max_token_a_amount,
+                max_token_b_amount,
+            } => {
                 msg!("Instruction: Deposit");
-                deposit::process(program_id, accounts, pool_token_amount, max_token_a_amount, max_token_b_amount)?;
+                deposit::process(
+                    program_id,
+                    accounts,
+                    pool_token_amount,
+                    max_token_a_amount,
+                    max_token_b_amount,
+                )?;
             }
-            ChudexInstruction::Withdraw { pool_token_amount, min_token_a_amount, min_token_b_amount } => {
+            ChudexInstruction::Withdraw {
+                pool_token_amount,
+                min_token_a_amount,
+                min_token_b_amount,
+            } => {
                 msg!("Instruction: Withdraw");
-                withdraw::process(program_id, accounts, pool_token_amount, min_token_a_amount, min_token_b_amount)?;
+                withdraw::process(
+                    program_id,
+                    accounts,
+                    pool_token_amount,
+                    min_token_a_amount,
+                    min_token_b_amount,
+                )?;
             }
-            ChudexInstruction::Exchange { amount_in, min_amount_out } => {
+            ChudexInstruction::Exchange {
+                amount_in,
+                min_amount_out,
+            } => {
                 msg!("Instruction: Withdraw");
                 exchange::process(program_id, accounts, amount_in, min_amount_out)?;
             }

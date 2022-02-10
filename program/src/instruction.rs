@@ -3,7 +3,7 @@ use borsh::{BorshDeserialize, BorshSerialize};
 #[derive(BorshSerialize, BorshDeserialize, Debug, Clone)]
 pub enum ChudexInstruction {
     /// Initializes a new pool. Creates mint and accounts for pool struct and token vaults.
-    /// 
+    ///
     /// Accounts:
     /// [signer] user
     /// [writable] pool
@@ -24,7 +24,7 @@ pub enum ChudexInstruction {
 
     /// Provides liquidity at current exchange rate for both tokens.
     /// Mints pool tokens to user.
-    /// 
+    ///
     /// Accounts:
     /// user
     /// user token acc a
@@ -44,7 +44,7 @@ pub enum ChudexInstruction {
 
     /// Withdraws tokens from pool at current exchange rate.
     /// Burns pool tokens.
-    /// 
+    ///
     /// Accounts:
     /// user
     /// user token acc a
