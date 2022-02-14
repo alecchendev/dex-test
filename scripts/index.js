@@ -125,36 +125,15 @@ const initTokens = async () => {
 
 }
 
-// init booth
-
-// send tokens to booth
-
-// exchange
-
-const main = async () => {
-
-  // cli arguments
-  var args = process.argv.slice(2);
-  const action = parseInt(args[0]);
-  // const echo = args[1];
-  // const price = parseInt(args[2]);
-
-  const {
+// init pool
+const initPool = async ({
     mint1,
     mint2,
-    userToken1Account,
-    userToken2Account,
     poolPubkey,
     boothVault1Pubkey,
     boothVault2Pubkey,
     poolMint,
-  } = await initTokens();
-
-  if (action === 0) {
-    return;
-  }
-
-  // TODO print balances of different tokens for each account
+  }) => {
 
   // Initialize exchange booth
   console.log("Initializing pool...");
@@ -247,7 +226,46 @@ const main = async () => {
   data = (await connection.getAccountInfo(poolPubkey)).data;
   console.log("Init Buffer Text:", data);
 
+}
+
+// send tokens to booth
+const deposit = async (accounts) => {
+
+}
+
+// exchange
+
+const main = async () => {
+
+  // cli arguments
+  var args = process.argv.slice(2);
+  const action = parseInt(args[0]);
+  // const echo = args[1];
+  // const price = parseInt(args[2]);
+
+  const accounts = await initTokens();
+
+  const {
+    mint1,
+    mint2,
+    userToken1Account,
+    userToken2Account,
+    poolPubkey,
+    boothVault1Pubkey,
+    boothVault2Pubkey,
+    poolMint,
+  } = accounts;
+
+  if (action === 0) {
+    await initPool(accounts);  
+    return;
+  }
+
   if (action === 1) {
+
+    // load in already initialized accounts
+
+    await deposit(accounts);
     return;
   }
 

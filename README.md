@@ -9,8 +9,8 @@ Then in the client folder, use these commands.
 ### To do
 - InitializePool
     - [x] fix token ordering
-    - clean extraneous accounts, documents accounts
-    - proper account validation
+    - [x] clean extraneous accounts, documents accounts
+    - [x] proper account validation
     - change mint account to PDA
 - General
     - rename instructions from chudex to amm
