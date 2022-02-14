@@ -110,7 +110,11 @@ const initTokens = async () => {
   );
 
   // pool mint
-  poolMint = Keypair.generate();
+  // poolMint = Keypair.generate();
+  const [poolMint, poolMintBump] = (await PublicKey.findProgramAddress(
+    [Buffer.from("chudex_pool_mint"), poolPubkey.toBuffer()],
+    programId
+  ));
 
   return {
     mint1,
@@ -175,8 +179,9 @@ const initPool = async ({
         isWritable: false,
       },
       {
-        pubkey: poolMint.publicKey,
-        isSigner: true,
+        pubkey: poolMint,
+        // isSigner: true,
+        isSigner: false,
         isWritable: true,
       },
       {
@@ -214,7 +219,7 @@ const initPool = async ({
   let initTxid = await sendAndConfirmTransaction(
     connection,
     initTx,
-    [user, poolMint],
+    [user],
     {
       skipPreflight: true,
       preflightCommitment: "confirmed",

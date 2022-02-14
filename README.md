@@ -12,6 +12,7 @@ Then in the client folder, use these commands.
     - [x] clean extraneous accounts, documents accounts
     - [x] proper account validation
     - change mint account to PDA
+    - check to see if pool with same mints already initialized - ordering
 - General
     - rename instructions from chudex to amm
     - make util functions for checking the ordering of mint a vs b

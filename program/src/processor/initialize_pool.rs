@@ -7,9 +7,8 @@ use solana_program::{
     program_error::ProgramError,
     program_pack::Pack,
     pubkey::Pubkey,
-    system_instruction,
+    system_instruction, system_program as system_program_ext,
     sysvar::{rent, Sysvar},
-    system_program as system_program_ext,
 };
 
 use crate::{
@@ -38,7 +37,6 @@ pub fn process(
     fee: u64,
     fee_decimals: u8,
 ) -> ProgramResult {
-
     // GET ACCOUNTS
     let accounts_iter = &mut accounts.iter();
 
@@ -95,7 +93,7 @@ pub fn process(
         "vault b pda aint right",
     )?;
 
-    // generate pool pda
+    // pool pda
     let (pool_key, pool_bump) = Pubkey::find_program_address(
         &[
             b"chudex_pool",
@@ -110,13 +108,16 @@ pub fn process(
         mint_b_ai.key.as_ref(),
         &[pool_bump],
     ];
-
-    // check pool pda
     assert_msg(
         *pool_ai.key == pool_key,
         ChudexError::InvalidProgramAddress.into(),
         "Pool address invalid",
     )?;
+
+    // pool mint pda
+    let (pool_mint_key, pool_mint_bump) =
+        Pubkey::find_program_address(&[b"chudex_pool_mint", pool_ai.key.as_ref()], program_id);
+    let pool_mint_seeds = &[b"chudex_pool_mint", pool_ai.key.as_ref(), &[pool_mint_bump]];
 
     // external program verification
     // token program
@@ -213,7 +214,32 @@ pub fn process(
     // create mint
     msg!("Initializing mint...");
     let mint_data_len = 82;
-    invoke(
+    // invoke(
+    //     &system_instruction::create_account(
+    //         user.key,
+    //         pool_mint_ai.key,
+    //         rent::Rent::get()?.minimum_balance(mint_data_len),
+    //         mint_data_len as u64,
+    //         &spl_token::id(),
+    //     ),
+    //     &[user.clone(), pool_mint_ai.clone(), system_program.clone()],
+    // )?;
+
+    // invoke(
+    //     &instruction::initialize_mint(
+    //         &spl_token::id(),
+    //         pool_mint_ai.key,
+    //         pool_ai.key,
+    //         Some(pool_ai.key),
+    //         POOL_MINT_DECIMALS,
+    //     )?,
+    //     &[
+    //         pool_mint_ai.clone(),
+    //         sysvar_rent.clone(),
+    //         token_program.clone(),
+    //     ],
+    // )?;
+    invoke_signed(
         &system_instruction::create_account(
             user.key,
             pool_mint_ai.key,
@@ -222,9 +248,10 @@ pub fn process(
             &spl_token::id(),
         ),
         &[user.clone(), pool_mint_ai.clone(), system_program.clone()],
+        &[pool_mint_seeds],
     )?;
 
-    invoke(
+    invoke_signed(
         &instruction::initialize_mint(
             &spl_token::id(),
             pool_mint_ai.key,
@@ -237,6 +264,7 @@ pub fn process(
             sysvar_rent.clone(),
             token_program.clone(),
         ],
+        &[pool_mint_seeds],
     )?;
     msg!("Initialized mint");
 

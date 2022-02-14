@@ -11,7 +11,7 @@ pub enum ChudexInstruction {
     /// [writable] pool token acc b
     /// mint a
     /// mint b
-    /// [signer, writable] pool token mint
+    /// [writable] pool token mint
     /// token program
     /// system program
     /// sysvar
