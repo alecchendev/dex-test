@@ -17,7 +17,6 @@ const {
 const { BN } = require("bn.js");
 
 const { mintAuthority, user } = require("./keys.js");
-const { pubkeyCmp } = require("./utils.js");
 
 const mint1Decimals = 9;
 const mint2Decimals = 6;
@@ -82,9 +81,7 @@ const initTokens = async () => {
   // PDAs
   // exchange booth pda
   console.log("Getting exchange booth PDA...");
-  const [ firstMintSeed, secondMintSeed ] = ((mint1.publicKey == pubkeyCmp(mint1.publicKey, mint2.publicKey)) ? 
-    [ mint1.publicKey, mint2.publicKey ] :
-    [ mint2.publicKey, mint1.publicKey ]);
+  const [ firstMintSeed, secondMintSeed ] = [ mint1.publicKey, mint2.publicKey ];
   
   console.log("firstMintSeed:", firstMintSeed.toBase58());
   console.log("secondMintSeed:", secondMintSeed.toBase58());

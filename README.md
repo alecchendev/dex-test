@@ -11,3 +11,6 @@ Then in the client folder, use these commands.
     - fix token ordering
     - clean extraneous accounts, documents accounts
     - proper account validation
+    - change mint account to PDA
+- General
+    - rename instructions from chudex to amm

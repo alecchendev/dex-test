@@ -37,8 +37,10 @@ pub fn process(
     fee: u64,
     fee_decimals: u8,
 ) -> ProgramResult {
+
     // GET ACCOUNTS
     let accounts_iter = &mut accounts.iter();
+
     let user = next_account_info(accounts_iter)?;
     let pool_ai = next_account_info(accounts_iter)?;
     let pool_vault_a_ai = next_account_info(accounts_iter)?;
@@ -51,14 +53,6 @@ pub fn process(
     let sysvar_rent = next_account_info(accounts_iter)?;
     let associated_token_program = next_account_info(accounts_iter)?;
 
-    // deserialize accounts
-    // let pool = Pool::try_from_slice(&pool_ai.try_borrow_data()?)?;
-    // let pool_vault_a = TokenAccount::unpack(&pool_vault_a_ai.try_borrow_data()?)?;
-    // let pool_vault_b = TokenAccount::unpack(&pool_vault_b_ai.try_borrow_data()?)?;
-    // let mint_a = Mint::unpack(&mint_a_ai.try_borrow_data()?)?;
-    // let mint_b = Mint::unpack(&mint_b_ai.try_borrow_data()?)?;
-    // let pool_mint = Mint::unpack(&pool_mint_ai.try_borrow_data()?)?;
-
     // ACCOUNT VALIDATION
 
     // user is signer
@@ -68,27 +62,39 @@ pub fn process(
         "User not signer",
     )?;
 
-    // pool is owner of vaults and mint_auth of mint
+    // PDAs
 
-    // token_program address
+    // vault a
+    let (vault_a_key, vault_a_bump) = Pubkey::find_program_address(
+        &[
+            pool_ai.key.as_ref(),
+            token_program.key.as_ref(),
+            mint_a_ai.key.as_ref(),
+        ],
+        &spl_associated_token_account::id(),
+    );
     assert_msg(
-        *token_program.key == spl_token::id(),
-        ChudexError::InvalidAccountAddress.into(),
-        "Token program wrong address",
+        vault_a_key == *pool_vault_a_ai.key,
+        ChudexError::InvalidProgramAddress.into(),
+        "vault a pda aint right",
     )?;
 
-    // check vaults match mints
+    // vault a
+    let (vault_b_key, vault_b_bump) = Pubkey::find_program_address(
+        &[
+            pool_ai.key.as_ref(),
+            token_program.key.as_ref(),
+            mint_b_ai.key.as_ref(),
+        ],
+        &spl_associated_token_account::id(),
+    );
+    assert_msg(
+        vault_b_key == *pool_vault_b_ai.key,
+        ChudexError::InvalidProgramAddress.into(),
+        "vault b pda aint right",
+    )?;
 
-    // pdas
-
-    // pool
-    let (mint_a_ai, mint_b_ai) = if pubkey_cmp(*mint_a_ai.key, *mint_b_ai.key) == 0 {
-        (mint_a_ai, mint_b_ai)
-    } else {
-        (mint_b_ai, mint_a_ai)
-    };
-    msg!("mint_a_ai.key: {}", *mint_a_ai.key);
-    msg!("mint_b_ai.key: {}", *mint_b_ai.key);
+    // generate pool pda
     let (pool_key, pool_bump) = Pubkey::find_program_address(
         &[
             b"chudex_pool",
@@ -104,153 +110,117 @@ pub fn process(
         &[pool_bump],
     ];
 
-    // assert_msg(
-    //     *pool_ai.key == pool_key,
-    //     ChudexError::InvalidProgramAddress.into(),
-    //     "Pool address invalid",
-    // )?;
+    // check pool pda
+    assert_msg(
+        *pool_ai.key == pool_key,
+        ChudexError::InvalidProgramAddress.into(),
+        "Pool address invalid",
+    )?;
 
+    // external program verification
+    // token program
+    assert_msg(
+        *token_program.key == spl_token::id(),
+        ChudexError::InvalidAccountAddress.into(),
+        "Token program wrong address",
+    )?;
+
+    // system program
+
+    // sysvar program
+
+    // check vaults match mints
+
+    // check data not initialized
+
+    // vault a data
+
+    // vault b data
+
+    // pool data
     assert_msg(
         pool_ai.data_len() == 0,
         ChudexError::AccountAlreadyInitialized.into(),
         "Pool already initialized",
     )?;
 
-    // vault a
-    // vault b
-    // mint
-
     // LOGIC
 
-    // create token vaults (if not initialized)
+    // create token vaults
     // create vault a
-    let (vault_a_key, vault_a_bump) = Pubkey::find_program_address(
+    msg!("initializing vault a...");
+    msg!("pool_vault_a_ai.key: {}", *pool_vault_a_ai.owner);
+
+    // create account
+    invoke(
+        &spl_associated_token_account::create_associated_token_account(
+            user.key,
+            pool_ai.key,
+            mint_a_ai.key,
+        ),
         &[
-            pool_ai.key.as_ref(),
-            token_program.key.as_ref(),
-            mint_a_ai.key.as_ref(),
+            user.clone(),
+            pool_vault_a_ai.clone(),
+            pool_ai.clone(),
+            mint_a_ai.clone(),
+            system_program.clone(),
+            token_program.clone(),
+            sysvar_rent.clone(),
+            associated_token_program.clone(),
         ],
-        &spl_associated_token_account::id(),
-    );
-    assert_msg(
-        vault_a_key == *pool_vault_a_ai.key,
-        ChudexError::InvalidProgramAddress.into(),
-        "vault a pda aint right",
     )?;
-    if pool_vault_a_ai.data_len() == 0 {
-        msg!("initializing vault a...");
-        msg!("pool_vault_a_ai.key: {}", *pool_vault_a_ai.owner);
-
-        // create account
-        invoke(
-            &spl_associated_token_account::create_associated_token_account(
-                user.key,
-                pool_ai.key,
-                mint_a_ai.key,
-            ),
-            &[
-                user.clone(),
-                pool_vault_a_ai.clone(),
-                pool_ai.clone(),
-                mint_a_ai.clone(),
-                system_program.clone(),
-                token_program.clone(),
-                sysvar_rent.clone(),
-                associated_token_program.clone(),
-            ],
-        );
-        // invoke_signed(
-        //     &system_instruction::create_account(
-        //         user.key,
-        //         pool_vault_a_ai.key,
-        //         Rent::get()?.minimum_balance(TokenAccount::LEN),
-        //         TokenAccount::LEN as u64,
-        //         token_program.key,
-        //     ),
-        //     &[user.clone(), pool_vault_a_ai.clone(), system_program.clone()],
-        //     &[&[ pool_ai.key.as_ref(), token_program.key.as_ref(), mint_a_ai.key.as_ref(), &[vault_a_bump] ]],
-        //     // &[ pool_seeds ],
-        // )?;
-
-        // invoke_signed(
-        //     &instruction::initialize_account(
-        //         &spl_token::id(),
-        //         pool_vault_a_ai.key,
-        //         mint_a_ai.key,
-        //         pool_ai.key
-        //     )?,
-        //     &[ pool_vault_a_ai.clone(), mint_a_ai.clone(), pool_ai.clone(), sysvar_rent.clone() ],
-        //     &[ pool_seeds ],
-        // )?;
-        msg!("initialized vault a");
-    }
+    msg!("initialized vault a");
 
     // create vault b
-    if pool_vault_b_ai.data_len() == 0 {
-        msg!("initializing vault b...");
-        invoke(
-            &spl_associated_token_account::create_associated_token_account(
-                user.key,
-                pool_ai.key,
-                mint_b_ai.key,
-            ),
-            &[
-                user.clone(),
-                pool_vault_b_ai.clone(),
-                pool_ai.clone(),
-                mint_b_ai.clone(),
-                system_program.clone(),
-                token_program.clone(),
-                sysvar_rent.clone(),
-                associated_token_program.clone(),
-            ],
-        )?;
-        msg!("initialized vault b");
-    }
+    msg!("initializing vault b...");
+    invoke(
+        &spl_associated_token_account::create_associated_token_account(
+            user.key,
+            pool_ai.key,
+            mint_b_ai.key,
+        ),
+        &[
+            user.clone(),
+            pool_vault_b_ai.clone(),
+            pool_ai.clone(),
+            mint_b_ai.clone(),
+            system_program.clone(),
+            token_program.clone(),
+            sysvar_rent.clone(),
+            associated_token_program.clone(),
+        ],
+    )?;
+    msg!("initialized vault b");
 
     // create mint
-    if pool_mint_ai.data_len() == 0 {
-        msg!("Initializing mint...");
-        let mint_data_len = 82;
-        invoke(
-            &system_instruction::create_account(
-                user.key,
-                pool_mint_ai.key,
-                Rent::get()?.minimum_balance(mint_data_len),
-                mint_data_len as u64,
-                &spl_token::id(),
-            ),
-            &[user.clone(), pool_mint_ai.clone(), system_program.clone()],
-        )?;
+    msg!("Initializing mint...");
+    let mint_data_len = 82;
+    invoke(
+        &system_instruction::create_account(
+            user.key,
+            pool_mint_ai.key,
+            Rent::get()?.minimum_balance(mint_data_len),
+            mint_data_len as u64,
+            &spl_token::id(),
+        ),
+        &[user.clone(), pool_mint_ai.clone(), system_program.clone()],
+    )?;
 
-        // msg!("Mint data len: {}", mint_data_len);
-        // let mint_data = pool_mint_ai.try_borrow_data()?;
-        // for i in 0..mint_data_len {
-        //     msg!("{}: {}", i, mint_data[i]);
-        // }
-        // let mut mint = Mint::unpack(&pool_mint_ai.try_borrow_data()?)?;
-        // let mut buffer = authorized_buffer.try_borrow_mut_data()?;
-        // buffer[0] = bump;
-        // for i in 0..8 {
-        //     buffer[i + 1] = buffer_seed.to_le_bytes()[i];
-        // }
-
-        invoke(
-            &instruction::initialize_mint(
-                &spl_token::id(),
-                pool_mint_ai.key,
-                pool_ai.key,
-                Some(pool_ai.key),
-                POOL_MINT_DECIMALS,
-            )?,
-            &[
-                pool_mint_ai.clone(),
-                sysvar_rent.clone(),
-                token_program.clone(),
-            ],
-        )?;
-        msg!("Initialized mint");
-    }
+    invoke(
+        &instruction::initialize_mint(
+            &spl_token::id(),
+            pool_mint_ai.key,
+            pool_ai.key,
+            Some(pool_ai.key),
+            POOL_MINT_DECIMALS,
+        )?,
+        &[
+            pool_mint_ai.clone(),
+            sysvar_rent.clone(),
+            token_program.clone(),
+        ],
+    )?;
+    msg!("Initialized mint");
 
     // create pool account to store data
     msg!("initializing pool...");
@@ -267,21 +237,9 @@ pub fn process(
     )?;
 
     // create pool struct and serialize data
-    let pool_vault_a = TokenAccount::unpack(&pool_vault_a_ai.try_borrow_data()?)?;
-    let pool_vault_b = TokenAccount::unpack(&pool_vault_b_ai.try_borrow_data()?)?;
-    let vault_a = if pool_vault_a.mint == *mint_a_ai.key {
-        *pool_vault_a_ai.key
-    } else {
-        *pool_vault_b_ai.key
-    };
-    let vault_b = if pool_vault_a.mint == *mint_a_ai.key {
-        *pool_vault_b_ai.key
-    } else {
-        *pool_vault_a_ai.key
-    };
     let pool = Pool {
-        vault_a: vault_a,
-        vault_b: vault_b,
+        vault_a: *pool_vault_a_ai.key,
+        vault_b: *pool_vault_b_ai.key,
         mint: *pool_mint_ai.key,
         fee: FEE,
         fee_decimals: FEE_DECIMALS,
