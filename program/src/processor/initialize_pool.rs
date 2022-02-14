@@ -8,7 +8,8 @@ use solana_program::{
     program_pack::Pack,
     pubkey::Pubkey,
     system_instruction,
-    sysvar::{rent::Rent, Sysvar},
+    sysvar::{rent, Sysvar},
+    system_program as system_program_ext,
 };
 
 use crate::{
@@ -64,7 +65,7 @@ pub fn process(
 
     // PDAs
 
-    // vault a
+    // vault a pda
     let (vault_a_key, vault_a_bump) = Pubkey::find_program_address(
         &[
             pool_ai.key.as_ref(),
@@ -79,7 +80,7 @@ pub fn process(
         "vault a pda aint right",
     )?;
 
-    // vault a
+    // vault b pda
     let (vault_b_key, vault_b_bump) = Pubkey::find_program_address(
         &[
             pool_ai.key.as_ref(),
@@ -126,16 +127,33 @@ pub fn process(
     )?;
 
     // system program
+    assert_msg(
+        *system_program.key == system_program_ext::id(),
+        ChudexError::InvalidAccountAddress.into(),
+        "System program wrong address",
+    )?;
 
     // sysvar program
-
-    // check vaults match mints
+    assert_msg(
+        *sysvar_rent.key == rent::id(),
+        ChudexError::InvalidAccountAddress.into(),
+        "Sysvar program wrong address",
+    )?;
 
     // check data not initialized
-
     // vault a data
+    assert_msg(
+        pool_vault_a_ai.data_len() == 0,
+        ChudexError::AccountAlreadyInitialized.into(),
+        "Vault a already initialized",
+    )?;
 
     // vault b data
+    assert_msg(
+        pool_vault_b_ai.data_len() == 0,
+        ChudexError::AccountAlreadyInitialized.into(),
+        "Vault b already initialized",
+    )?;
 
     // pool data
     assert_msg(
@@ -199,7 +217,7 @@ pub fn process(
         &system_instruction::create_account(
             user.key,
             pool_mint_ai.key,
-            Rent::get()?.minimum_balance(mint_data_len),
+            rent::Rent::get()?.minimum_balance(mint_data_len),
             mint_data_len as u64,
             &spl_token::id(),
         ),
@@ -228,7 +246,7 @@ pub fn process(
         &system_instruction::create_account(
             user.key,
             pool_ai.key,
-            Rent::get()?.minimum_balance(mem::size_of::<Pool>()),
+            rent::Rent::get()?.minimum_balance(mem::size_of::<Pool>()),
             mem::size_of::<Pool>() as u64,
             program_id,
         ),
@@ -241,8 +259,8 @@ pub fn process(
         vault_a: *pool_vault_a_ai.key,
         vault_b: *pool_vault_b_ai.key,
         mint: *pool_mint_ai.key,
-        fee: FEE,
-        fee_decimals: FEE_DECIMALS,
+        fee: fee,
+        fee_decimals: fee_decimals,
     };
     pool.serialize(&mut *pool_ai.try_borrow_mut_data()?)?;
     msg!("initialized pool");
