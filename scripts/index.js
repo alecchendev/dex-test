@@ -144,6 +144,55 @@ const initTokens = async () => {
 
 }
 
+const printTokens = ({
+  mint1,
+  mint2,
+  userToken1Account,
+  userToken2Account,
+  poolPubkey,
+  boothVault1Pubkey,
+  boothVault2Pubkey,
+  poolMint,
+  userPoolTokenAccount
+}) => {
+
+  console.log("const mint1Pubkey = new PublicKey(\"", mint1.publicKey.toBase58());
+  console.log("const mint2Pubkey = new PublicKey(\"", mint2.publicKey.toBase58());
+  console.log("const userToken1AccountPubkey = new PublicKey(\"", userToken1Account.address.toBase58());
+  console.log("const userToken2AccountPubkey = new PublicKey(\"", userToken2Account.address.toBase58());
+  console.log("const poolPubkey = new PublicKey(\"", poolPubkey.toBase58());
+  console.log("const boothVault1Pubkey = new PublicKey(\"", boothVault1Pubkey.toBase58());
+  console.log("const boothVault2Pubkey = new PublicKey(\"", boothVault2Pubkey.toBase58());
+  console.log("const poolMintPubkey = new PublicKey(\"", poolMint.toBase58());
+  console.log("const userPoolTokenAccountPubkey = new PublicKey(\"", userPoolTokenAccount.toBase58());
+
+}
+
+const loadTokens = () => {
+
+  const mint1Pubkey = new PublicKey("AMuzE8VMo6EFwrVCXyLgESzTZz9LYk6PfL4AjcUYJiwx");
+  const mint2Pubkey = new PublicKey("F3eAwSsonM7HyGFMMnscGhoyzXju1HQKPgbXZ6RA17f1");
+  const userToken1AccountPubkey = new PublicKey("BXmAzbzM3avXxXsHbSBPqFAQqa263HTKXGpfpiQeV6Rc");
+  const userToken2AccountPubkey = new PublicKey("88L9HP89vHCNEYMAYB8qQ8x5JsHeX8DpndHwzsbRezdb");
+  const poolPubkey = new PublicKey("9GQTusTXaktLhBTW9oebosqVb4E3rS2axb1XcmW6VHm1");
+  const boothVault1Pubkey = new PublicKey("Fz3dZ1fr2jrpjp7BXiEhQkvQfCFAvPz4is1UimKiu3VY");
+  const boothVault2Pubkey = new PublicKey("8Lz5g4pAE1qL63tYAALKtnXyA2JmxffgCB1UwPFY4RPQ");
+  const poolMintPubkey = new PublicKey("3J5KaJNFRLD8CyqhiB7SZecA5u6VKfEoRuzPUBi4oxx2");
+  const userPoolTokenAccountPubkey = new PublicKey("9RuN13MzHDM3LkqgbbQpWYSnSjsD3otnoQcJixK8JJho");
+
+  return {
+    mint1Pubkey,
+    mint2Pubkey,
+    userToken1AccountPubkey,
+    userToken2AccountPubkey,
+    poolPubkey,
+    boothVault1Pubkey,
+    boothVault2Pubkey,
+    poolMintPubkey,
+    userPoolTokenAccountPubkey
+  }
+}
+
 // init pool
 const initPool = async ({
     mint1,
@@ -250,13 +299,15 @@ const initPool = async ({
 
 // send tokens to booth
 const deposit = async ({
-  userToken1Account,
-  userToken2Account,
+  userToken1AccountPubkey,
+  userToken2AccountPubkey,
   poolPubkey,
   boothVault1Pubkey,
   boothVault2Pubkey,
-  poolMint,
-  userPoolTokenAccount,
+  poolMintPubkey,
+  userPoolTokenAccountPubkey,
+  mint1Pubkey,
+  mint2Pubkey
 }, poolTokenAmount, tokenAAmount, maxTokenBAmount) => {
 
   console.log("Depositing tokens...");
@@ -273,17 +324,17 @@ const deposit = async ({
         isWritable: false,
       },
       {
-        pubkey: userToken1Account.address,
+        pubkey: userToken1AccountPubkey,
         isSigner: false,
         isWritable: true,
       },
       {
-        pubkey: userToken2Account.address,
+        pubkey: userToken2AccountPubkey,
         isSigner: false,
         isWritable: true,
       },
       {
-        pubkey: userPoolTokenAccount,
+        pubkey: userPoolTokenAccountPubkey,
         isSigner: false,
         isWritable: true,
       },
@@ -303,7 +354,7 @@ const deposit = async ({
         isWritable: true,
       },
       {
-        pubkey: poolMint,
+        pubkey: poolMintPubkey,
         // isSigner: true,
         isSigner: false,
         isWritable: true,
@@ -352,6 +403,17 @@ const deposit = async ({
   );
   console.log(`https://explorer.solana.com/tx/${depositTxid}?cluster=devnet`);
 
+  // check balances
+  const userToken1AccountInfo = (await connection.getParsedTokenAccountsByOwner(user.publicKey, { mint: mint1Pubkey })).value[0].account.data.parsed.info;
+  const userToken2AccountInfo = (await connection.getParsedTokenAccountsByOwner(user.publicKey, { mint: mint2Pubkey })).value[0].account.data.parsed.info;
+  vault1AccountInfo = (await connection.getParsedTokenAccountsByOwner(poolPubkey, { mint: mint1Pubkey })).value[0].account.data.parsed.info;
+  vault2AccountInfo = (await connection.getParsedTokenAccountsByOwner(poolPubkey, { mint: mint2Pubkey })).value[0].account.data.parsed.info;
+  console.log("userToken1Account balance:", userToken1AccountInfo.tokenAmount.amount);
+  console.log("userToken2ccount balance:", userToken2AccountInfo.tokenAmount.amount);
+  console.log("vault1Account balance:", vault1AccountInfo.tokenAmount.amount);
+  console.log("vault2Account balance:", vault2AccountInfo.tokenAmount.amount);
+
+
 }
 
 // exchange
@@ -364,28 +426,26 @@ const main = async () => {
   // const echo = args[1];
   // const price = parseInt(args[2]);
 
-  const accounts = await initTokens();
-
-  const {
-    mint1,
-    mint2,
-    userToken1Account,
-    userToken2Account,
-    poolPubkey,
-    boothVault1Pubkey,
-    boothVault2Pubkey,
-    poolMint,
-    userPoolTokenAccount,
-  } = accounts;
-
   if (action === 0) {
+
+    const accounts = await initTokens();
+    await initPool(accounts);
+    printTokens(accounts);
+    return;
+
+  }
+
+  if (action === 1) {
+    const accounts = await initTokens();
     await initPool(accounts);  
     return;
   }
 
-  if (action === 1) {
+
+  if (action === 2) {
 
     // load in already initialized accounts
+    const accounts = loadTokens();
 
     await deposit(accounts, 1 * poolMintDecimals, 2 * mint1Decimals, 3 * mint2Decimals);
     return;
