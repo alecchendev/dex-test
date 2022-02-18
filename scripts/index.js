@@ -22,6 +22,7 @@ const mint1Decimals = 9;
 const mint2Decimals = 6;
 const fee = 5;
 const feeDecimals = 3;
+const poolMintDecimals = 9;
 
 const programId = new PublicKey("G4QQ465gehN97upZxMh1Z4GWi347nhi9cuoxVRDdUTZf");
 
@@ -115,6 +116,14 @@ const initTokens = async () => {
     [Buffer.from("chudex_pool_mint"), poolPubkey.toBuffer()],
     programId
   ));
+  
+  const userPoolTokenAccount = await Token.getAssociatedTokenAddress(
+    ASSOCIATED_TOKEN_PROGRAM_ID,
+    TOKEN_PROGRAM_ID,
+    poolMint,
+    user.publicKey,
+    true,
+  );
 
   return {
     mint1,
@@ -124,7 +133,8 @@ const initTokens = async () => {
     poolPubkey,
     boothVault1Pubkey,
     boothVault2Pubkey,
-    poolMint
+    poolMint,
+    userPoolTokenAccount
   }
 
 }
@@ -234,7 +244,108 @@ const initPool = async ({
 }
 
 // send tokens to booth
-const deposit = async (accounts) => {
+const deposit = async ({
+  userToken1Account,
+  userToken2Account,
+  poolPubkey,
+  boothVault1Pubkey,
+  boothVault2Pubkey,
+  poolMint,
+  userPoolTokenAccount,
+}, poolTokenAmount, maxTokenAAmount, maxTokenBAmount) => {
+
+  console.log("Depositing tokens...");
+
+  const poolTokenAmountBuffer = Buffer.from(new Uint8Array((new BN(poolTokenAmount)).toArray("le", 8)));
+  const maxTokenAAmountBuffer = Buffer.from(new Uint8Array((new BN(maxTokenAAmount)).toArray("le", 8)));
+  const maxTokenBAmountBuffer = Buffer.from(new Uint8Array((new BN(maxTokenBAmount)).toArray("le", 8)));
+
+  let depositIx = new TransactionInstruction({
+    keys: [
+      {
+        pubkey: user.publicKey,
+        isSigner: true,
+        isWritable: false,
+      },
+      {
+        pubkey: userToken1Account.address,
+        isSigner: false,
+        isWritable: true,
+      },
+      {
+        pubkey: userToken2Account.address,
+        isSigner: false,
+        isWritable: true,
+      },
+      {
+        pubkey: userPoolTokenAccount.address,
+        isSigner: false,
+        isWritable: true,
+      },
+      {
+        pubkey: poolPubkey,
+        isSigner: false,
+        isWritable: true,
+      },
+      {
+        pubkey: boothVault1Pubkey,
+        isSigner: false,
+        isWritable: true,
+      },
+      {
+        pubkey: boothVault2Pubkey,
+        isSigner: false,
+        isWritable: true,
+      },
+      {
+        pubkey: poolMint,
+        // isSigner: true,
+        isSigner: false,
+        isWritable: true,
+      },
+      {
+        pubkey: TOKEN_PROGRAM_ID,
+        isSigner: false,
+        isWritable: false,
+      },
+      {
+        pubkey: SystemProgram.programId,
+        isSigner: false,
+        isWritable: false,
+      },
+      {
+        pubkey: SYSVAR_RENT_PUBKEY,
+        isSigner: false,
+        isWritable: false,
+      },
+      {
+        pubkey: ASSOCIATED_TOKEN_PROGRAM_ID,
+        isSigner: false,
+        isWritable: false,
+      },
+    ],
+    programId: programId,
+    data: Buffer.concat([
+      initIdx,
+      feeBuffer,
+      feeDecimalsBuffer,
+    ]),
+  });
+
+  let depositTx = new Transaction();
+  depositTx.add(depositIx);
+
+  let depositTxid = await sendAndConfirmTransaction(
+    connection,
+    depositTx,
+    [user],
+    {
+      skipPreflight: true,
+      preflightCommitment: "confirmed",
+      confirmation: "confirmed",
+    }
+  );
+  console.log(`https://explorer.solana.com/tx/${depositTxid}?cluster=devnet`);
 
 }
 
@@ -259,6 +370,7 @@ const main = async () => {
     boothVault1Pubkey,
     boothVault2Pubkey,
     poolMint,
+    userPoolTokenAccount,
   } = accounts;
 
   if (action === 0) {
@@ -270,7 +382,7 @@ const main = async () => {
 
     // load in already initialized accounts
 
-    await deposit(accounts);
+    await deposit(accounts, 1 * poolMintDecimals, 2 * mint1Decimals, 3 * mint2Decimals);
     return;
   }
 

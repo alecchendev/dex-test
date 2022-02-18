@@ -23,22 +23,24 @@ pub enum ChudexInstruction {
     },
 
     /// Provides liquidity at current exchange rate for both tokens.
-    /// Mints pool tokens to user.
+    /// Mints pool tokens to user. Creates user pool token acc if needed.
     ///
     /// Accounts:
-    /// user
-    /// user token acc a
-    /// user token acc b
-    /// user pool token acc
+    /// [signer, writable] user
+    /// [writable] user token acc a
+    /// [writable] user token acc b
+    /// [writable] user pool token acc
     /// pool
-    /// pool token acc a
-    /// pool token acc b
+    /// [writable] pool token acc a
+    /// [writable] pool token acc b
     /// pool token mint
     /// token program
+    /// system program
+    /// sysvar
+    /// associated token program
     Deposit {
         // TODO
-        pool_token_amount: u64,
-        max_token_a_amount: u64,
+        token_a_amount: u64,
         max_token_b_amount: u64,
     },
 

@@ -28,16 +28,14 @@ impl Processor {
                 initialize_pool::process(program_id, accounts, fee, fee_decimals)?;
             }
             ChudexInstruction::Deposit {
-                pool_token_amount,
-                max_token_a_amount,
+                token_a_amount,
                 max_token_b_amount,
             } => {
                 msg!("Instruction: Deposit");
                 deposit::process(
                     program_id,
                     accounts,
-                    pool_token_amount,
-                    max_token_a_amount,
+                    token_a_amount,
                     max_token_b_amount,
                 )?;
             }
