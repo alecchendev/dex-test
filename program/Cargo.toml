@@ -16,6 +16,7 @@ spl-associated-token-account = {version = "1.0.3", features = ["no-entrypoint"]}
 num-traits = "0.2.14"
 num-derive = "0.3"
 thiserror = "1.0"
+bs58 = "0.4.0"
 
 [features]
 test-bpf = []

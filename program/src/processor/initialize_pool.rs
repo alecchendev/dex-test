@@ -11,6 +11,8 @@ use solana_program::{
     sysvar::{rent, Sysvar},
 };
 
+use bs58;
+
 use crate::{
     error::ChudexError,
     state::Pool,
@@ -94,7 +96,7 @@ pub fn process(
     )?;
 
     // pool pda
-    let (mint_a_seed, mint_b_seed) = if mint_a_ai.key < mint_b_ai.key {
+    let (mint_a_seed, mint_b_seed) = if bs58::encode(mint_a_ai.key).into_string() < bs58::encode(mint_b_ai.key).into_string() {
         (mint_a_ai.key, mint_b_ai.key)
     } else {
         (mint_b_ai.key, mint_a_ai.key)
