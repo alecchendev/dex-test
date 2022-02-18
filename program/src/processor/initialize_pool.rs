@@ -12,6 +12,7 @@ use solana_program::{
 };
 
 use bs58;
+use std::cmp;
 
 use crate::{
     error::ChudexError,
@@ -225,31 +226,6 @@ pub fn process(
     // create mint
     msg!("Initializing mint...");
     let mint_data_len = 82;
-    // invoke(
-    //     &system_instruction::create_account(
-    //         user.key,
-    //         pool_mint_ai.key,
-    //         rent::Rent::get()?.minimum_balance(mint_data_len),
-    //         mint_data_len as u64,
-    //         &spl_token::id(),
-    //     ),
-    //     &[user.clone(), pool_mint_ai.clone(), system_program.clone()],
-    // )?;
-
-    // invoke(
-    //     &instruction::initialize_mint(
-    //         &spl_token::id(),
-    //         pool_mint_ai.key,
-    //         pool_ai.key,
-    //         Some(pool_ai.key),
-    //         POOL_MINT_DECIMALS,
-    //     )?,
-    //     &[
-    //         pool_mint_ai.clone(),
-    //         sysvar_rent.clone(),
-    //         token_program.clone(),
-    //     ],
-    // )?;
     invoke_signed(
         &system_instruction::create_account(
             user.key,
@@ -262,13 +238,17 @@ pub fn process(
         &[pool_mint_seeds],
     )?;
 
+    // find the larger decimal of the two token mints
+    let mint_a = Mint::unpack_from_slice(&mint_a_ai.try_borrow_data()?)?;
+    let mint_b = Mint::unpack_from_slice(&mint_b_ai.try_borrow_data()?)?;
+    let pool_mint_decimals = cmp::max(mint_a.decimals, mint_b.decimals);
     invoke_signed(
         &instruction::initialize_mint(
             &spl_token::id(),
             pool_mint_ai.key,
             pool_ai.key,
             Some(pool_ai.key),
-            POOL_MINT_DECIMALS,
+            pool_mint_decimals,
         )?,
         &[
             pool_mint_ai.clone(),

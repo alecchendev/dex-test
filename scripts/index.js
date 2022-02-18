@@ -156,29 +156,29 @@ const printTokens = ({
   userPoolTokenAccount
 }) => {
 
-  console.log("const mint1Pubkey = new PublicKey(\"", mint1.publicKey.toBase58());
-  console.log("const mint2Pubkey = new PublicKey(\"", mint2.publicKey.toBase58());
-  console.log("const userToken1AccountPubkey = new PublicKey(\"", userToken1Account.address.toBase58());
-  console.log("const userToken2AccountPubkey = new PublicKey(\"", userToken2Account.address.toBase58());
-  console.log("const poolPubkey = new PublicKey(\"", poolPubkey.toBase58());
-  console.log("const boothVault1Pubkey = new PublicKey(\"", boothVault1Pubkey.toBase58());
-  console.log("const boothVault2Pubkey = new PublicKey(\"", boothVault2Pubkey.toBase58());
-  console.log("const poolMintPubkey = new PublicKey(\"", poolMint.toBase58());
-  console.log("const userPoolTokenAccountPubkey = new PublicKey(\"", userPoolTokenAccount.toBase58());
+  console.log("const mint1Pubkey = new PublicKey(\"" + mint1.publicKey.toBase58() + "\");");
+  console.log("const mint2Pubkey = new PublicKey(\"" + mint2.publicKey.toBase58() + "\");");
+  console.log("const userToken1AccountPubkey = new PublicKey(\"" + userToken1Account.address.toBase58() + "\");");
+  console.log("const userToken2AccountPubkey = new PublicKey(\"" + userToken2Account.address.toBase58() + "\");");
+  console.log("const poolPubkey = new PublicKey(\"" + poolPubkey.toBase58() + "\");");
+  console.log("const boothVault1Pubkey = new PublicKey(\"" + boothVault1Pubkey.toBase58() + "\");");
+  console.log("const boothVault2Pubkey = new PublicKey(\"" + boothVault2Pubkey.toBase58() + "\");");
+  console.log("const poolMintPubkey = new PublicKey(\"" + poolMint.toBase58() + "\");");
+  console.log("const userPoolTokenAccountPubkey = new PublicKey(\"" + userPoolTokenAccount.toBase58() + "\");");
 
 }
 
 const loadTokens = () => {
 
-  const mint1Pubkey = new PublicKey("AMuzE8VMo6EFwrVCXyLgESzTZz9LYk6PfL4AjcUYJiwx");
-  const mint2Pubkey = new PublicKey("F3eAwSsonM7HyGFMMnscGhoyzXju1HQKPgbXZ6RA17f1");
-  const userToken1AccountPubkey = new PublicKey("BXmAzbzM3avXxXsHbSBPqFAQqa263HTKXGpfpiQeV6Rc");
-  const userToken2AccountPubkey = new PublicKey("88L9HP89vHCNEYMAYB8qQ8x5JsHeX8DpndHwzsbRezdb");
-  const poolPubkey = new PublicKey("9GQTusTXaktLhBTW9oebosqVb4E3rS2axb1XcmW6VHm1");
-  const boothVault1Pubkey = new PublicKey("Fz3dZ1fr2jrpjp7BXiEhQkvQfCFAvPz4is1UimKiu3VY");
-  const boothVault2Pubkey = new PublicKey("8Lz5g4pAE1qL63tYAALKtnXyA2JmxffgCB1UwPFY4RPQ");
-  const poolMintPubkey = new PublicKey("3J5KaJNFRLD8CyqhiB7SZecA5u6VKfEoRuzPUBi4oxx2");
-  const userPoolTokenAccountPubkey = new PublicKey("9RuN13MzHDM3LkqgbbQpWYSnSjsD3otnoQcJixK8JJho");
+  const mint1Pubkey = new PublicKey("4bPuxzuL3tSTG7VLjpuqCZoeKGCLJ4JNr65iiamVe7Ce");
+  const mint2Pubkey = new PublicKey("CHK4v4jrVVkDdmS2EscqhTbCjZdXUQrQUKavckxeCR2x");
+  const userToken1AccountPubkey = new PublicKey("GUKT8XKb8XPAtt726YNEpeZBkjkQR2sJ3iXB2C5xNgfo");
+  const userToken2AccountPubkey = new PublicKey("H6aK5bN7cf3yzh3Bu6BWBPGoJdsxfZ3SAAK7t7CdheYR");
+  const poolPubkey = new PublicKey("GUnsyMworJZEUAhdGz2bzErru8jPCDQ3x84S94ibE6zp");
+  const boothVault1Pubkey = new PublicKey("3PUVjAbXwUjqK4tvK6TyrW6qJwyWb98NzE4tK6kV9iyM");
+  const boothVault2Pubkey = new PublicKey("AwcsMRR8ckFidrXTREiKWRd7SJzHxXeZe64xVLNH99nQ");
+  const poolMintPubkey = new PublicKey("EBaHj9XttE8NGxJmykFDTZbq76b2m1HKiM7i9iixQcTy");
+  const userPoolTokenAccountPubkey = new PublicKey("FEDLSRW6R1p2x4S6tFzp2uaK7YAhFqsZt8KYNWeeiTB1");
 
   return {
     mint1Pubkey,
