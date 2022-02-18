@@ -14,7 +14,7 @@ use solana_program::{
 use crate::{
     error::ChudexError,
     state::Pool,
-    utils::{assert_msg, pubkey_cmp},
+    utils::{assert_msg},
 };
 
 use borsh::{BorshDeserialize, BorshSerialize};
@@ -94,18 +94,28 @@ pub fn process(
     )?;
 
     // pool pda
+    let (mint_a_seed, mint_b_seed) = if mint_a_ai.key < mint_b_ai.key {
+        (mint_a_ai.key, mint_b_ai.key)
+    } else {
+        (mint_b_ai.key, mint_a_ai.key)
+    };
+    msg!("mint a pubkey: {}\nmint b pubkey: {}\nmint a seed: {}\nmint b seed: {}", mint_a_ai.key.to_string(), mint_b_ai.key.to_string(), mint_a_seed, mint_b_seed.to_string());
     let (pool_key, pool_bump) = Pubkey::find_program_address(
         &[
             b"chudex_pool",
-            mint_a_ai.key.as_ref(),
-            mint_b_ai.key.as_ref(),
+            // mint_a_ai.key.as_ref(),
+            // mint_b_ai.key.as_ref(),
+            mint_a_seed.as_ref(),
+            mint_b_seed.as_ref()
         ],
         program_id,
     );
     let pool_seeds = &[
         b"chudex_pool",
-        mint_a_ai.key.as_ref(),
-        mint_b_ai.key.as_ref(),
+        // mint_a_ai.key.as_ref(),
+        // mint_b_ai.key.as_ref(),
+        mint_a_seed.as_ref(),
+        mint_b_seed.as_ref(),
         &[pool_bump],
     ];
     assert_msg(
@@ -168,7 +178,6 @@ pub fn process(
     // create token vaults
     // create vault a
     msg!("initializing vault a...");
-    msg!("pool_vault_a_ai.key: {}", *pool_vault_a_ai.owner);
 
     // create account
     invoke(

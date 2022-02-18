@@ -82,7 +82,12 @@ const initTokens = async () => {
   // PDAs
   // exchange booth pda
   console.log("Getting exchange booth PDA...");
-  const [ firstMintSeed, secondMintSeed ] = [ mint1.publicKey, mint2.publicKey ];
+  const [ firstMintSeed, secondMintSeed ] = (mint1.publicKey < mint2.publicKey)
+    ? [ mint1.publicKey, mint2.publicKey ]
+    : [ mint2.publicKey, mint1.publicKey ];
+  
+  console.log("mint1 pubkey:", mint1.publicKey.toBase58());
+  console.log("mint2 pubkey:", mint2.publicKey.toBase58());
   
   console.log("firstMintSeed:", firstMintSeed.toBase58());
   console.log("secondMintSeed:", secondMintSeed.toBase58());

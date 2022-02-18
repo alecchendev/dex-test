@@ -8,11 +8,3 @@ pub fn assert_msg(statement: bool, err: ProgramError, msg: &str) -> ProgramResul
         Ok(())
     }
 }
-
-pub fn pubkey_cmp(a: Pubkey, b: Pubkey) -> u8 {
-    if a < b {
-        0
-    } else {
-        1
-    }
-}
