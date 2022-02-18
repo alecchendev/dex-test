@@ -32,12 +32,7 @@ impl Processor {
                 max_token_b_amount,
             } => {
                 msg!("Instruction: Deposit");
-                deposit::process(
-                    program_id,
-                    accounts,
-                    token_a_amount,
-                    max_token_b_amount,
-                )?;
+                deposit::process(program_id, accounts, token_a_amount, max_token_b_amount)?;
             }
             ChudexInstruction::Withdraw {
                 pool_token_amount,

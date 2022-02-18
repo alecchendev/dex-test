@@ -14,11 +14,7 @@ use solana_program::{
 use bs58;
 use std::cmp;
 
-use crate::{
-    error::ChudexError,
-    state::Pool,
-    utils::{assert_msg},
-};
+use crate::{error::ChudexError, state::Pool, utils::assert_msg};
 
 use borsh::{BorshDeserialize, BorshSerialize};
 
@@ -97,19 +93,26 @@ pub fn process(
     )?;
 
     // pool pda
-    let (mint_a_seed, mint_b_seed) = if bs58::encode(mint_a_ai.key).into_string() < bs58::encode(mint_b_ai.key).into_string() {
-        (mint_a_ai.key, mint_b_ai.key)
-    } else {
-        (mint_b_ai.key, mint_a_ai.key)
-    };
-    msg!("mint a pubkey: {}\nmint b pubkey: {}\nmint a seed: {}\nmint b seed: {}", mint_a_ai.key.to_string(), mint_b_ai.key.to_string(), mint_a_seed, mint_b_seed.to_string());
+    let (mint_a_seed, mint_b_seed) =
+        if bs58::encode(mint_a_ai.key).into_string() < bs58::encode(mint_b_ai.key).into_string() {
+            (mint_a_ai.key, mint_b_ai.key)
+        } else {
+            (mint_b_ai.key, mint_a_ai.key)
+        };
+    msg!(
+        "mint a pubkey: {}\nmint b pubkey: {}\nmint a seed: {}\nmint b seed: {}",
+        mint_a_ai.key.to_string(),
+        mint_b_ai.key.to_string(),
+        mint_a_seed,
+        mint_b_seed.to_string()
+    );
     let (pool_key, pool_bump) = Pubkey::find_program_address(
         &[
             b"chudex_pool",
             // mint_a_ai.key.as_ref(),
             // mint_b_ai.key.as_ref(),
             mint_a_seed.as_ref(),
-            mint_b_seed.as_ref()
+            mint_b_seed.as_ref(),
         ],
         program_id,
     );
@@ -153,6 +156,14 @@ pub fn process(
         ChudexError::InvalidAccountAddress.into(),
         "Sysvar program wrong address",
     )?;
+
+    // associated token program
+    assert_msg(
+        *associated_token_program.key == spl_associated_token_account::id(),
+        ChudexError::InvalidAccountAddress.into(),
+        "Associated token program wrong address",
+    )?;
+
 
     // check data not initialized
     // vault a data
