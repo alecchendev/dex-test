@@ -257,12 +257,12 @@ const deposit = async ({
   boothVault2Pubkey,
   poolMint,
   userPoolTokenAccount,
-}, poolTokenAmount, maxTokenAAmount, maxTokenBAmount) => {
+}, poolTokenAmount, tokenAAmount, maxTokenBAmount) => {
 
   console.log("Depositing tokens...");
 
-  const poolTokenAmountBuffer = Buffer.from(new Uint8Array((new BN(poolTokenAmount)).toArray("le", 8)));
-  const maxTokenAAmountBuffer = Buffer.from(new Uint8Array((new BN(maxTokenAAmount)).toArray("le", 8)));
+  const depositIdx = Buffer.from(new Uint8Array([1]));
+  const tokenAAmountBuffer = Buffer.from(new Uint8Array((new BN(tokenAAmount)).toArray("le", 8)));
   const maxTokenBAmountBuffer = Buffer.from(new Uint8Array((new BN(maxTokenBAmount)).toArray("le", 8)));
 
   let depositIx = new TransactionInstruction({
@@ -283,14 +283,14 @@ const deposit = async ({
         isWritable: true,
       },
       {
-        pubkey: userPoolTokenAccount.address,
+        pubkey: userPoolTokenAccount,
         isSigner: false,
         isWritable: true,
       },
       {
         pubkey: poolPubkey,
         isSigner: false,
-        isWritable: true,
+        isWritable: false,
       },
       {
         pubkey: boothVault1Pubkey,
@@ -331,9 +331,9 @@ const deposit = async ({
     ],
     programId: programId,
     data: Buffer.concat([
-      initIdx,
-      feeBuffer,
-      feeDecimalsBuffer,
+      depositIdx,
+      tokenAAmountBuffer,
+      maxTokenBAmountBuffer,
     ]),
   });
 
