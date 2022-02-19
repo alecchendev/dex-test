@@ -175,15 +175,15 @@ const printTokens = ({
 
 const loadTokens = () => {
 
-  const mint1Pubkey = new PublicKey("BiBni27MdhNyY95P99M1sjVkyVw22ZiXgUvZYkNG6GmT");
-  const mint2Pubkey = new PublicKey("3XvwB3YfGFWEW8L2Ux3kwi4pG7nRpdjALAEqctwDHPvM");
-  const userToken1AccountPubkey = new PublicKey("Gb48WX13wcmd5F5YtNnDUaYNQTZR8fKnaeDjdrnZnmKY");
-  const userToken2AccountPubkey = new PublicKey("UoJxY6ysrJxtDQ9DpZ8WLHy8zbGnpkgi35EQzmSXbem");
-  const poolPubkey = new PublicKey("9z4aCtUFSohwTm8vnbytPC7v1k5UKuSjCk7hF1RtT11e");
-  const boothVault1Pubkey = new PublicKey("HSMqk8JvCR99XMZu3Ayw24xbCWyXeLjKiwyUJVNDQNJd");
-  const boothVault2Pubkey = new PublicKey("99XW8hy3g3Z2G6iiZ4ZVdETUBaysVgo8CtJfswY2wMQm");
-  const poolMintPubkey = new PublicKey("2ptfWi36hwpQLHxhSJy1mhKjARVWpW4NJjLwj9YE3GVT");
-  const userPoolTokenAccountPubkey = new PublicKey("DLuHvLQ5hCw5qY9ftpstywNwGyGrzvcb7YG5DDERH2rv");
+  const mint1Pubkey = new PublicKey("42wvvNTEtv9wfe29xLi2S4dRMmf3gNZUCD97kDkYgC4F");
+  const mint2Pubkey = new PublicKey("AotEf2YtxRHVozBXFPdQNtC95VaNHdnjBfX67MkZvGwB");
+  const userToken1AccountPubkey = new PublicKey("Bef5MCxew1zJ6JCaBw9CBj3FXvSSdqAvtG6ViEPwAqTg");
+  const userToken2AccountPubkey = new PublicKey("qNWVUFthfDdsZ83C3zpZPiaJudeCr6vsm2juNeUKn4E");
+  const poolPubkey = new PublicKey("B4oXacpYZgcABaofrYBcMSSvfznbFDBfAe1HGTgFLo8N");
+  const boothVault1Pubkey = new PublicKey("6qdQ3n8xmDGQmkHs1RybxQNtrKM99hGn3PTf4LGyxYmj");
+  const boothVault2Pubkey = new PublicKey("88H2FC8oR1j8veFTFZWvej93sXrvVznKxuTvE4p2UBXM");
+  const poolMintPubkey = new PublicKey("9FDMEEWdXsFGfVmAobE3nPrgsuqAshBNxNT63J1nn19L");
+  const userPoolTokenAccountPubkey = new PublicKey("4a2JTREXnYfF8CXE2FXQRxpNJHA9bPVpdq68GXtysG6y");
 
   return {
     mint1Pubkey,
@@ -452,7 +452,7 @@ const main = async () => {
     // load in already initialized accounts
     const accounts = loadTokens();
 
-    await deposit(accounts, 0.01 * (10 ** mint1Decimals), 0.021 * (10 ** mint2Decimals));
+    await deposit(accounts, 0.01 * (10 ** mint1Decimals), 0.04 * (10 ** mint2Decimals));
     return;
   }
 

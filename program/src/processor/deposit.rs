@@ -112,7 +112,12 @@ pub fn process(
     } else {
         ((token_a_amount as f64) * (pool_vault_b.amount as f64) / (pool_vault_a.amount as f64)) as u64
     };
-    msg!("Got token amounts");
+
+    if token_b_amount > max_token_b_amount {
+        return Err(ChudexError::DepositAmountExceedsLimit.into());
+    }
+
+    msg!("Got token amounts - a: {} b: {}", token_a_amount, token_b_amount);
 
     // deposit
     // deposit token 1

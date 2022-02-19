@@ -24,6 +24,8 @@ pub enum ChudexError {
     InvalidInstructionInput,
     #[error("Invalid account data.")]
     InvalidAccountData,
+    #[error("Deposit amount exceeds limit.")]
+    DepositAmountExceedsLimit,
 }
 
 impl From<ChudexError> for ProgramError {
