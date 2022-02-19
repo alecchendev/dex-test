@@ -82,9 +82,14 @@ const initTokens = async () => {
   // PDAs
   // exchange booth pda
   console.log("Getting exchange booth PDA...");
-  const [ firstMintSeed, secondMintSeed ] = (mint1.publicKey < mint2.publicKey)
-    ? [ mint1.publicKey, mint2.publicKey ]
-    : [ mint2.publicKey, mint1.publicKey ];
+  const [ mint1Info, mint2Info ] = [ await mint1.getMintInfo(), await mint2.getMintInfo() ];
+  const [ firstMintSeed, secondMintSeed ] = (mint1Info.decimals === mint2Info.decimals)
+    ? ((mint1.publicKey < mint2.publicKey)
+      ? [ mint1.publicKey, mint2.publicKey ]
+      : [ mint2.publicKey, mint1.publicKey ])
+    : ((mint1Info.decimals < mint2Info.decimals)
+      ? [ mint1.publicKey, mint2.publicKey ]
+      : [ mint2.publicKey, mint1.publicKey ]);
   
   console.log("mint1 pubkey:", mint1.publicKey.toBase58());
   console.log("mint2 pubkey:", mint2.publicKey.toBase58());
@@ -170,15 +175,15 @@ const printTokens = ({
 
 const loadTokens = () => {
 
-  const mint1Pubkey = new PublicKey("4bPuxzuL3tSTG7VLjpuqCZoeKGCLJ4JNr65iiamVe7Ce");
-  const mint2Pubkey = new PublicKey("CHK4v4jrVVkDdmS2EscqhTbCjZdXUQrQUKavckxeCR2x");
-  const userToken1AccountPubkey = new PublicKey("GUKT8XKb8XPAtt726YNEpeZBkjkQR2sJ3iXB2C5xNgfo");
-  const userToken2AccountPubkey = new PublicKey("H6aK5bN7cf3yzh3Bu6BWBPGoJdsxfZ3SAAK7t7CdheYR");
-  const poolPubkey = new PublicKey("GUnsyMworJZEUAhdGz2bzErru8jPCDQ3x84S94ibE6zp");
-  const boothVault1Pubkey = new PublicKey("3PUVjAbXwUjqK4tvK6TyrW6qJwyWb98NzE4tK6kV9iyM");
-  const boothVault2Pubkey = new PublicKey("AwcsMRR8ckFidrXTREiKWRd7SJzHxXeZe64xVLNH99nQ");
-  const poolMintPubkey = new PublicKey("EBaHj9XttE8NGxJmykFDTZbq76b2m1HKiM7i9iixQcTy");
-  const userPoolTokenAccountPubkey = new PublicKey("FEDLSRW6R1p2x4S6tFzp2uaK7YAhFqsZt8KYNWeeiTB1");
+  const mint1Pubkey = new PublicKey("BiBni27MdhNyY95P99M1sjVkyVw22ZiXgUvZYkNG6GmT");
+  const mint2Pubkey = new PublicKey("3XvwB3YfGFWEW8L2Ux3kwi4pG7nRpdjALAEqctwDHPvM");
+  const userToken1AccountPubkey = new PublicKey("Gb48WX13wcmd5F5YtNnDUaYNQTZR8fKnaeDjdrnZnmKY");
+  const userToken2AccountPubkey = new PublicKey("UoJxY6ysrJxtDQ9DpZ8WLHy8zbGnpkgi35EQzmSXbem");
+  const poolPubkey = new PublicKey("9z4aCtUFSohwTm8vnbytPC7v1k5UKuSjCk7hF1RtT11e");
+  const boothVault1Pubkey = new PublicKey("HSMqk8JvCR99XMZu3Ayw24xbCWyXeLjKiwyUJVNDQNJd");
+  const boothVault2Pubkey = new PublicKey("99XW8hy3g3Z2G6iiZ4ZVdETUBaysVgo8CtJfswY2wMQm");
+  const poolMintPubkey = new PublicKey("2ptfWi36hwpQLHxhSJy1mhKjARVWpW4NJjLwj9YE3GVT");
+  const userPoolTokenAccountPubkey = new PublicKey("DLuHvLQ5hCw5qY9ftpstywNwGyGrzvcb7YG5DDERH2rv");
 
   return {
     mint1Pubkey,
@@ -208,7 +213,7 @@ const initPool = async ({
 
   const initIdx = Buffer.from(new Uint8Array([0]));
   const feeBuffer = Buffer.from(new Uint8Array((new BN(fee)).toArray("le", 8)));
-  const feeDecimalsBuffer = Buffer.from(new Uint8Array((new BN(feeDecimals)).toArray("le", 1)));
+  const feeDecimalsBuffer = Buffer.from(new Uint8Array((new BN(feeDecimals)).toArray("le", 8)));
 
   let initIx = new TransactionInstruction({
     keys: [
@@ -308,7 +313,7 @@ const deposit = async ({
   userPoolTokenAccountPubkey,
   mint1Pubkey,
   mint2Pubkey
-}, poolTokenAmount, tokenAAmount, maxTokenBAmount) => {
+}, tokenAAmount, maxTokenBAmount) => {
 
   console.log("Depositing tokens...");
 
@@ -447,7 +452,7 @@ const main = async () => {
     // load in already initialized accounts
     const accounts = loadTokens();
 
-    await deposit(accounts, 1 * poolMintDecimals, 2 * mint1Decimals, 3 * mint2Decimals);
+    await deposit(accounts, 0.01 * (10 ** mint1Decimals), 0.021 * (10 ** mint2Decimals));
     return;
   }
 

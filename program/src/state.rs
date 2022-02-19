@@ -9,5 +9,5 @@ pub struct Pool {
     pub vault_b: Pubkey,
     pub mint: Pubkey,
     pub fee: u64,
-    pub fee_decimals: u8,
+    pub fee_decimals: u64,
 }

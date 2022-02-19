@@ -34,7 +34,7 @@ pub fn process(
     program_id: &Pubkey,
     accounts: &[AccountInfo],
     fee: u64,
-    fee_decimals: u8,
+    fee_decimals: u64,
 ) -> ProgramResult {
     // GET ACCOUNTS
     let accounts_iter = &mut accounts.iter();
@@ -93,12 +93,21 @@ pub fn process(
     )?;
 
     // pool pda
-    let (mint_a_seed, mint_b_seed) =
+    let mint_a = Mint::unpack_from_slice(&mint_a_ai.try_borrow_data()?)?;
+    let mint_b = Mint::unpack_from_slice(&mint_b_ai.try_borrow_data()?)?;
+    let (mint_a_seed, mint_b_seed) = if mint_a.decimals == mint_b.decimals {
         if bs58::encode(mint_a_ai.key).into_string() < bs58::encode(mint_b_ai.key).into_string() {
             (mint_a_ai.key, mint_b_ai.key)
         } else {
             (mint_b_ai.key, mint_a_ai.key)
-        };
+        }
+    } else {
+        if mint_a.decimals < mint_b.decimals {
+            (mint_a_ai.key, mint_b_ai.key)
+        } else {
+            (mint_b_ai.key, mint_a_ai.key)
+        }
+    };
     msg!(
         "mint a pubkey: {}\nmint b pubkey: {}\nmint a seed: {}\nmint b seed: {}",
         mint_a_ai.key.to_string(),
@@ -163,7 +172,6 @@ pub fn process(
         ChudexError::InvalidAccountAddress.into(),
         "Associated token program wrong address",
     )?;
-
 
     // check data not initialized
     // vault a data
@@ -250,8 +258,6 @@ pub fn process(
     )?;
 
     // find the larger decimal of the two token mints
-    let mint_a = Mint::unpack_from_slice(&mint_a_ai.try_borrow_data()?)?;
-    let mint_b = Mint::unpack_from_slice(&mint_b_ai.try_borrow_data()?)?;
     let pool_mint_decimals = cmp::max(mint_a.decimals, mint_b.decimals);
     invoke_signed(
         &instruction::initialize_mint(
@@ -286,8 +292,8 @@ pub fn process(
 
     // create pool struct and serialize data
     let pool = Pool {
-        vault_a: *pool_vault_a_ai.key,
-        vault_b: *pool_vault_b_ai.key,
+        vault_a: *mint_a_seed,
+        vault_b: *mint_b_seed,
         mint: *pool_mint_ai.key,
         fee: fee,
         fee_decimals: fee_decimals,

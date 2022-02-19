@@ -19,7 +19,7 @@ pub enum ChudexInstruction {
     InitializePool {
         // TODO
         fee: u64,
-        fee_decimals: u8,
+        fee_decimals: u64,
     },
 
     /// Provides liquidity at current exchange rate for both tokens.
