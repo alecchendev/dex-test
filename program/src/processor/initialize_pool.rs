@@ -102,7 +102,7 @@ pub fn process(
             (mint_b_ai.key, mint_a_ai.key)
         }
     } else {
-        if mint_a.decimals < mint_b.decimals {
+        if mint_a.decimals > mint_b.decimals {
             (mint_a_ai.key, mint_b_ai.key)
         } else {
             (mint_b_ai.key, mint_a_ai.key)
@@ -135,7 +135,7 @@ pub fn process(
     ];
     assert_msg(
         *pool_ai.key == pool_key,
-        ChudexError::InvalidProgramAddress.into(),
+        ChudexError::InvalidAccountAddress.into(),
         "Pool address invalid",
     )?;
 
@@ -143,6 +143,11 @@ pub fn process(
     let (pool_mint_key, pool_mint_bump) =
         Pubkey::find_program_address(&[b"chudex_pool_mint", pool_ai.key.as_ref()], program_id);
     let pool_mint_seeds = &[b"chudex_pool_mint", pool_ai.key.as_ref(), &[pool_mint_bump]];
+    assert_msg(
+        *pool_mint_ai.key == pool_mint_key,
+        ChudexError::InvalidAccountAddress.into(),
+        "Pool mint address invalid",
+    )?;
 
     // external program verification
     // token program
@@ -292,8 +297,8 @@ pub fn process(
 
     // create pool struct and serialize data
     let pool = Pool {
-        vault_a: *mint_a_seed,
-        vault_b: *mint_b_seed,
+        mint_a: *mint_a_seed,
+        mint_b: *mint_b_seed,
         mint: *pool_mint_ai.key,
         fee: fee,
         fee_decimals: fee_decimals,

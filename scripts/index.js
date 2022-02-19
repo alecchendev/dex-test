@@ -87,7 +87,7 @@ const initTokens = async () => {
     ? ((mint1.publicKey < mint2.publicKey)
       ? [ mint1.publicKey, mint2.publicKey ]
       : [ mint2.publicKey, mint1.publicKey ])
-    : ((mint1Info.decimals < mint2Info.decimals)
+    : ((mint1Info.decimals > mint2Info.decimals)
       ? [ mint1.publicKey, mint2.publicKey ]
       : [ mint2.publicKey, mint1.publicKey ]);
   
