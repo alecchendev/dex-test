@@ -1,4 +1,4 @@
-# chudex
+# dex-test
 Basic dex/amm for educational reference and practice with newfound solana skillz.
 
 ### Usage
@@ -17,5 +17,5 @@ Then in the client folder, use these commands.
     - Test script
     - 
 - General
-    - rename instructions from chudex to amm
+    - rename instructions from chudex to dex test or amm
     - make util functions for checking the ordering of mint a vs b
