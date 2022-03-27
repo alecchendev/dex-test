@@ -24,7 +24,8 @@ const fee = 5;
 const feeDecimals = 3;
 const poolMintDecimals = 9;
 
-const programId = new PublicKey("G4QQ465gehN97upZxMh1Z4GWi347nhi9cuoxVRDdUTZf");
+// const programId = new PublicKey("G4QQ465gehN97upZxMh1Z4GWi347nhi9cuoxVRDdUTZf");
+const programId = new PublicKey("BNavAdaGNxnGXBFKyWRaEMjdp5j3yUmmkffbHbpHuWac");
 
 // Connect to cluster
 const connection = new Connection(
